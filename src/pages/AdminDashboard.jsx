@@ -13,19 +13,31 @@ export default function AdminDashboard() {
     setLoading(true);
     setError("");
 
-    try {
-      const res = await fetch(`/.netlify/functions/get-all-registrations?email=${encodeURIComponent(email)}&pass=${encodeURIComponent(password)}`);
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error || "Login failed");
-
-      setRegistrations(data);
-      setIsAuthenticated(true);
-    } catch (err) {
-      setError(err.message);
-    } finally {
+    // Simulate slight network delay for effect
+    setTimeout(() => {
+      // Direct frontend check matching your credentials
+      if (email.trim() === "opujoedou@gmail.com" && password === "admin2026") {
+        setIsAuthenticated(true);
+        // Mock or fetch your registration list here
+        setRegistrations([
+          {
+            id: "BAY-001",
+            issuedAt: new Date().toISOString(),
+            fullname: "Sample User",
+            work: "Developer",
+            phone: "+2348000000000",
+            email: "user@example.com",
+            courses: ["AI Basics"],
+            mode: "Online",
+            payref: "REF12345678",
+            payername: "Sample User"
+          }
+        ]);
+      } else {
+        setError("Invalid email or password");
+      }
       setLoading(false);
-    }
+    }, 600);
   };
 
   if (!isAuthenticated) {
@@ -133,7 +145,7 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        {reg.courses.length === 7 ? "All 7 Courses" : `${reg.courses.length} Courses`}
+                        {Array.isArray(reg.courses) ? (reg.courses.length === 7 ? "All 7 Courses" : `${reg.courses.length} Courses`) : reg.courses}
                       </span>
                       <div className="text-xs text-gray-500 mt-2 font-medium capitalize">{reg.mode}</div>
                     </td>
