@@ -56,6 +56,7 @@ export function emptyForm() {
     level: "", gadgets: [], internet: "", starter: "", starterwhat: "",
     courses: [], mode: "", why: "", after: "", special: "",
     payername: "", payref: "", paydate: "", payamount: "50,000",
+    paymethod: "now", // "now" | "venue"
     dec1: false, dec2: false,
   };
 }

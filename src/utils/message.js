@@ -38,13 +38,19 @@ export function registrationText(r) {
   if (r.special) L.push("*Notes:* " + r.special);
   L.push("");
   L.push("*PAYMENT*");
-  L.push("Paid by: " + r.payername);
-  L.push("Reference: " + r.payref);
-  L.push("Date paid: " + niceDate(r.paydate));
-  L.push("Amount: ₦" + r.payamount);
-  L.push("To: Parallex Bank / Joseph Opuene / 2000033733");
+  if (r.paymethod === "venue") {
+    L.push("Will pay ₦50,000 in cash at the venue on arrival.");
+  } else {
+    L.push("Paid by: " + r.payername);
+    L.push("Reference: " + r.payref);
+    L.push("Date paid: " + niceDate(r.paydate));
+    L.push("Amount: ₦" + r.payamount);
+    L.push("To: Parallex Bank / Joseph Opuene / 2000033733");
+  }
   L.push("");
-  L.push("_Attaching my payment receipt and passport photograph to this chat._");
+  L.push(r.paymethod === "venue"
+    ? "_Attaching my passport photograph to this chat._"
+    : "_Attaching my payment receipt and passport photograph to this chat._");
   return L.join("\n");
 }
 

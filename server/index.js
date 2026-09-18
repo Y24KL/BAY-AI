@@ -6,7 +6,7 @@ import { isAdmin } from "./adminAuth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-app.use(express.json({ limit: "15mb" })); // passport photo / receipt come in as data URLs
+app.use(express.json({ limit: "25mb" })); // passport photo + receipt come in as data URLs
 
 const TABLE = "registrations";
 const ID_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
@@ -21,10 +21,12 @@ function randomIdSuffix() {
 
 const REQUIRED_FIELDS = [
   "fullname", "email", "phone", "dob", "nationality", "address",
-  "occupation", "internet", "why", "after", "payername", "payref", "paydate", "payamount",
+  "occupation", "internet", "why", "after",
 ];
+const REQUIRED_PAY_NOW_FIELDS = ["payername", "payref", "paydate", "payamount"];
 
 function toRow(id, body) {
+  const payMethod = body.paymethod === "venue" ? "venue" : "now";
   return {
     id,
     issued_at: new Date().toISOString(),
@@ -36,15 +38,50 @@ function toRow(id, body) {
     starter: body.starter || "", starterwhat: body.starterwhat || "",
     courses: body.courses || [], mode: body.mode || "",
     why: body.why, after: body.after, special: body.special || "",
-    payername: body.payername, payref: body.payref, paydate: body.paydate, payamount: body.payamount,
+    payername: body.payername || "", payref: body.payref || "",
+    paydate: body.paydate || null, payamount: body.payamount || "",
     passport_photo: body.passportPhoto || null,
     receipt_name: body.receiptName || "",
+    receipt_file: body.receiptFile || null,
+    pay_method: payMethod,
+    payment_status: payMethod === "venue" ? "venue" : "pending",
   };
 }
 
 function fromRow(row) {
   if (!row) return row;
-  return { ...row, issuedAt: row.issued_at, passportPhoto: row.passport_photo, receiptName: row.receipt_name };
+  return {
+    ...row,
+    issuedAt: row.issued_at,
+    passportPhoto: row.passport_photo,
+    receiptName: row.receipt_name,
+    receiptFile: row.receipt_file,
+    paymethod: row.pay_method || "now",
+    paymentStatus: row.payment_status || "pending",
+  };
+}
+
+// Fields an admin edit is allowed to write, mapped to their actual DB
+// columns. Whitelisted on purpose: the object the client edits/holds also
+// carries the camelCase aliases fromRow() adds (issuedAt, passportPhoto,
+// etc.) alongside the raw snake_case columns, and passing that straight
+// through to .update() would send unknown-column keys and error out.
+const EDITABLE_FIELDS = {
+  fullname: "fullname", email: "email", phone: "phone", dob: "dob", gender: "gender",
+  nationality: "nationality", stateorigin: "stateorigin", address: "address", work: "work",
+  occupation: "occupation", orgname: "orgname", level: "level", gadgets: "gadgets",
+  internet: "internet", starter: "starter", starterwhat: "starterwhat", courses: "courses",
+  mode: "mode", why: "why", after: "after", special: "special", payername: "payername",
+  payref: "payref", paydate: "paydate", payamount: "payamount",
+  paymentStatus: "payment_status",
+};
+
+function toPatch(body) {
+  const patch = {};
+  for (const key of Object.keys(EDITABLE_FIELDS)) {
+    if (Object.prototype.hasOwnProperty.call(body, key)) patch[EDITABLE_FIELDS[key]] = body[key];
+  }
+  return patch;
 }
 
 // ---- POST /api/register ----
@@ -53,6 +90,14 @@ app.post("/api/register", async (req, res) => {
   for (const field of REQUIRED_FIELDS) {
     if (!body[field] || String(body[field]).trim() === "") {
       return res.status(400).json({ error: `Missing required field: ${field}` });
+    }
+  }
+  const payMethod = body.paymethod === "venue" ? "venue" : "now";
+  if (payMethod === "now") {
+    for (const field of REQUIRED_PAY_NOW_FIELDS) {
+      if (!body[field] || String(body[field]).trim() === "") {
+        return res.status(400).json({ error: `Missing required field: ${field}` });
+      }
     }
   }
   if (!Array.isArray(body.courses) || body.courses.length === 0) {
@@ -97,13 +142,18 @@ app.get("/api/admin/registrations", async (req, res) => {
   res.json(data.map(fromRow));
 });
 
-// ---- POST /api/admin/registrations/:id (edit) ----
+// ---- POST /api/admin/registrations/:id (edit / approve) ----
 app.post("/api/admin/registrations/:id", async (req, res) => {
   if (!isAdmin(req)) return res.status(401).json({ error: "Unauthorized access" });
-  const patch = { ...req.body };
-  delete patch.id; // id is never editable
+  const patch = toPatch(req.body);
+  if (Object.keys(patch).length === 0) {
+    return res.status(400).json({ error: "No editable fields in request body" });
+  }
   const { data, error } = await supabase.from(TABLE).update(patch).eq("id", req.params.id).select().maybeSingle();
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) {
+    console.error("[admin update] error:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
   if (!data) return res.status(404).json({ error: "Not found" });
   res.json({ ok: true, registration: fromRow(data) });
 });

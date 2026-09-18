@@ -25,13 +25,16 @@ create table if not exists registrations (
   why text not null,
   after text not null,
   special text,
-  payername text not null,
-  payref text not null,
-  paydate date not null,
-  payamount text not null,
+  payername text,
+  payref text,
+  paydate date,
+  payamount text,
   passport_photo text,     -- stored as a data URL; fine for launch, move to
                             -- Supabase Storage later if the table gets large
-  receipt_name text
+  receipt_name text,
+  receipt_file text,       -- the uploaded receipt itself, as a data URL
+  pay_method text not null default 'now',        -- 'now' | 'venue'
+  payment_status text not null default 'pending' -- 'pending' | 'approved' | 'venue'
 );
 
 create index if not exists registrations_payref_idx on registrations (payref);
@@ -40,3 +43,13 @@ create index if not exists registrations_payref_idx on registrations (payref);
 -- Security), so RLS can stay locked down. If you'd rather use the anon key
 -- instead, enable RLS and add policies permitting the operations you need:
 -- alter table registrations enable row level security;
+
+-- If your table already existed before these columns were added, run this
+-- instead of (or in addition to) the create table above — it's safe to run
+-- even if the columns/constraints are already there.
+alter table registrations add column if not exists receipt_file text;
+alter table registrations add column if not exists payment_status text not null default 'pending';
+alter table registrations add column if not exists pay_method text not null default 'now';
+alter table registrations alter column payref drop not null;
+alter table registrations alter column paydate drop not null;
+alter table registrations alter column payamount drop not null;

@@ -124,12 +124,12 @@ export function drawRegistrationCard(canvas, r, passportImg) {
   inner("ATTENDING", r.mode.indexOf("Online") === 0 ? "Online" : r.mode.indexOf("Either") === 0 ? "Online or on-site" : "On-site, Yenagoa");
   inner("TRAINING WEEK", "First week of October 2026");
   inner("VENUE", "Ebitari Hotel, Yenagoa");
-  inner("FEE STATUS", "₦50,000 — pending confirmation");
+  inner("FEE STATUS", r.paymethod === "venue" ? "₦50,000 — pay at venue" : "₦50,000 — pending confirmation");
 
   y += bh + 66;
   g.fillStyle = "#9FD4B0";
   g.font = '500 21px Inter, sans-serif';
-  g.fillText("Payment reference: " + r.payref, M, y);
+  g.fillText(r.paymethod === "venue" ? "Payment: due at the venue on arrival" : "Payment reference: " + r.payref, M, y);
   y += 34;
   g.fillText("Issued: " + new Date(r.issuedAt || Date.now()).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }), M, y);
 
