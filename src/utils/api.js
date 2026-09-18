@@ -5,13 +5,13 @@ function makeIdFallback() {
   return "BAY-AI-" + s + "-" + Date.now().toString(36).slice(-3).toUpperCase();
 }
 
-// Submits the registration. Tries the Netlify Function first (which assigns a
-// server-side, storage-verified unique ID). If the function is unreachable
-// (e.g. running outside Netlify, or offline), falls back to a locally
+// Submits the registration. Tries the server API first (assigns a
+// server-side, database-verified unique ID). If the server is unreachable
+// (e.g. running the frontend alone, or offline), falls back to a locally
 // generated ID so the participant is never blocked from getting their card.
 export async function submitRegistration(payload) {
   try {
-    const res = await fetch("/.netlify/functions/register", {
+    const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -25,7 +25,7 @@ export async function submitRegistration(payload) {
 }
 
 export async function fetchRegistration(id) {
-  const res = await fetch("/.netlify/functions/get-registration?id=" + encodeURIComponent(id));
+  const res = await fetch("/api/registration/" + encodeURIComponent(id));
   if (!res.ok) return null;
   return res.json();
 }

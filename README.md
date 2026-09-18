@@ -50,3 +50,24 @@ getting their card, but the ID won't be server-verified as unique.
 Connect this repo to Netlify (or run `netlify deploy`). `netlify.toml`
 already points the build at `dist/`, wires up `netlify/functions/`, and
 adds the SPA redirect needed for React Router.
+
+## Deploying on Render
+
+This app now runs as a single Render Web Service: it builds the React
+frontend (`npm run build`) and serves it from a small Express server
+(`server/index.js`) that also exposes the registration/admin API and talks
+to Supabase (Postgres) directly — no Netlify-specific pieces are used.
+
+1. In Supabase, open the SQL editor and run `supabase-schema.sql` once to
+   create the `registrations` table.
+2. In your Render service → **Environment**, set:
+   - `SUPABASE_URL` — your Supabase project URL
+   - `SUPABASE_SERVICE_ROLE_KEY` — the service-role key (Settings → API in
+     Supabase). This key bypasses Row Level Security, so keep it out of the
+     frontend — it's only ever read server-side, in `server/supabaseServer.js`.
+   - `ADMIN_EMAIL` / `ADMIN_PASSWORD` — login for `/admin`
+3. Build command: `npm install && npm run build`
+   Start command: `npm start` (runs `server/index.js`)
+
+`render.yaml` documents this as a Blueprint if you'd rather provision the
+service from it directly.

@@ -1,3 +1,9 @@
+/* Tailwind utilities power the /admin dashboard only. Preflight (@tailwind
+   base) is intentionally left out so it doesn't reset the hand-written
+   typography/spacing used by the rest of this hand-crafted site. */
+@tailwind components;
+@tailwind utilities;
+
 :root{
   --ink:#08150E;
   --forest:#064420;
