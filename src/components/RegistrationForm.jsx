@@ -352,4 +352,5 @@ export default function RegistrationForm() {
 
             {step === 4 && (
               <div className="pay">
-                <div className="step-hd"><div className="step-no" style={{ background: "var(--gold)", color: "#12200F" }}>5</d
+                <div className="step-hd"><div className="step-no" style={{ background: "var(--gold)", color: "#12200F" }}>5</div><h3 className="step-ti" style={{ color: "#fff" }}>Pay ₦50,000, then submit</h3></div>
+                
