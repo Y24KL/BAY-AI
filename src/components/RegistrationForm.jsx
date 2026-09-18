@@ -128,13 +128,13 @@ export default function RegistrationForm() {
     const payload = { ...data, passportPhoto: passportPreview, receiptName };
     const result = await submitRegistration(payload);
     setSubmitting(false);
-    if (!result.stored) {
-      setSubmitError("We couldn't reach the registration server, so your ID was generated on this device. Please also send your details on WhatsApp as a backup.");
-    }
     navigate(`/registration/${result.id}`, {
       state: {
         registration: { ...data, id: result.id, issuedAt: result.issuedAt },
         passportPhoto: passportPreview,
+        // Not persisted server-side, so this only shows once, right after
+        // submission — a page refresh or shared link won't carry it forward.
+        storageError: result.stored ? null : (result.error || "unknown error"),
       },
     });
   }

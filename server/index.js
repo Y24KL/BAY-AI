@@ -62,14 +62,21 @@ app.post("/api/register", async (req, res) => {
   let id = null;
   for (let attempt = 0; attempt < MAX_ID_ATTEMPTS; attempt++) {
     const candidate = "BAY-AI-" + randomIdSuffix();
-    const { data } = await supabase.from(TABLE).select("id").eq("id", candidate).maybeSingle();
+    const { data, error } = await supabase.from(TABLE).select("id").eq("id", candidate).maybeSingle();
+    if (error) {
+      console.error("[register] id-lookup error:", error.message);
+      return res.status(500).json({ error: "Database error while allocating ID: " + error.message });
+    }
     if (!data) { id = candidate; break; }
   }
   if (!id) return res.status(503).json({ error: "Could not allocate a unique ID, try again" });
 
   const row = toRow(id, body);
   const { error } = await supabase.from(TABLE).insert(row);
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) {
+    console.error("[register] insert error:", error.message, error.details || "");
+    return res.status(500).json({ error: error.message });
+  }
 
   res.json({ id, issuedAt: row.issued_at, stored: true });
 });

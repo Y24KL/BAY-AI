@@ -16,11 +16,15 @@ export async function submitRegistration(payload) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error("status " + res.status);
+    if (!res.ok) {
+      let msg = "status " + res.status;
+      try { msg = (await res.json()).error || msg; } catch { /* body wasn't JSON */ }
+      throw new Error(msg);
+    }
     const data = await res.json();
     return { ...data, stored: true };
   } catch (err) {
-    return { id: makeIdFallback(), issuedAt: new Date().toISOString(), stored: false, error: String(err) };
+    return { id: makeIdFallback(), issuedAt: new Date().toISOString(), stored: false, error: String(err.message || err) };
   }
 }
 

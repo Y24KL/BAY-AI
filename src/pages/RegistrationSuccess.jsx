@@ -127,6 +127,17 @@ export default function RegistrationSuccess() {
           REGISTRATION COMPLETE<br />Welcome to the Bayelsa State Professional AI Training Expedition.
         </h1>
         <p style={{ color: "#9FD4B0", marginTop: 10 }}>Your registration has been successfully received.</p>
+        {location.state?.storageError && (
+          <p style={{
+            color: "#FFD7D7", background: "rgba(208,31,44,0.18)", border: "1px solid rgba(208,31,44,0.5)",
+            borderRadius: 10, padding: "10px 16px", margin: "14px auto 0", maxWidth: 480, fontSize: 13.5, lineHeight: 1.5,
+          }}>
+            Your ID was generated on this device because the registration server couldn't be reached
+            ({location.state.storageError}). <strong>It isn't saved on our end yet</strong> — please also
+            send your details via the WhatsApp/Email buttons below as a backup, and try registering again
+            later if possible.
+          </p>
+        )}
         <p style={{ color: "#9FD4B0", fontSize: 13, letterSpacing: ".18em", fontWeight: 700, marginTop: 30 }}>YOUR REGISTRATION ID</p>
         <div className="regid-reveal">{registration.id || id}</div>
 
