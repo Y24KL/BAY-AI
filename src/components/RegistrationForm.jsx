@@ -135,8 +135,6 @@ export default function RegistrationForm() {
       state: {
         registration: { ...data, id: result.id, issuedAt: result.issuedAt },
         passportPhoto: passportPreview,
-        // Not persisted server-side, so this only shows once, right after
-        // submission — a page refresh or shared link won't carry it forward.
         storageError: result.stored ? null : (result.error || "unknown error"),
       },
     });
@@ -353,4 +351,96 @@ export default function RegistrationForm() {
             {step === 4 && (
               <div className="pay">
                 <div className="step-hd"><div className="step-no" style={{ background: "var(--gold)", color: "#12200F" }}>5</div><h3 className="step-ti" style={{ color: "#fff" }}>Pay ₦50,000, then submit</h3></div>
-                
+                <p className="pnote">Transfer the fee to the account below. Your registration is confirmed only after we match your payment.</p>
+                <div className="acct">
+                  <div className="acct-row"><span className="acct-k">Bank</span><span className="acct-v">{BANK.bank}</span></div>
+                  <div className="acct-row"><span className="acct-k">Account name</span><span className="acct-v">{BANK.name}</span></div>
+                  <div className="acct-row"><span className="acct-k">Account number</span>
+                    <span style={{ display: "flex", alignItems: "center", gap: 11 }}>
+                      <span className="acct-v big">{BANK.account}</span>
+                      <CopyButton text={BANK.account} />
+                    </span>
+                  </div>
+                  <div className="acct-row"><span className="acct-k">Amount</span><span className="acct-v" style={{ color: "var(--gold)" }}>₦{BANK.amount}</span></div>
+                </div>
+                <div className="warn">Keep your transfer receipt. You need the transaction reference below — it is how we match your payment to your name.</div>
+                <div className="grid2">
+                  <div className="f"><label className="lb">Name on the account you paid from <span className="req">*</span></label>
+                    <input type="text" value={data.payername} onChange={(e) => set("payername", e.target.value)} placeholder="If someone paid for you, their name" />
+                    {errors.payername && <div className="err">{errors.payername}</div>}
+                  </div>
+                  <div className="f"><label className="lb">Transaction reference or teller number <span className="req">*</span></label>
+                    <input type="text" value={data.payref} onChange={(e) => set("payref", e.target.value)} placeholder="From your bank alert or receipt" />
+                    {errors.payref && <div className="err">{errors.payref}</div>}
+                  </div>
+                </div>
+                <div className="grid2">
+                  <div className="f"><label className="lb">Date you paid <span className="req">*</span></label>
+                    <input type="date" value={data.paydate} onChange={(e) => set("paydate", e.target.value)} />
+                    {errors.paydate && <div className="err">{errors.paydate}</div>}
+                  </div>
+                  <div className="f"><label className="lb">Amount paid <span className="req">*</span></label>
+                    <input type="text" value={data.payamount} onChange={(e) => set("payamount", e.target.value)} />
+                    {errors.payamount && <div className="err">{errors.payamount}</div>}
+                  </div>
+                </div>
+                <div className="f"><label className="lb">Upload your payment receipt <span className="req">*</span></label>
+                  <label className={`up${receiptName ? " filled" : ""}`}>
+                    <input type="file" accept="image/*,application/pdf" onChange={onReceipt} />
+                    <span className="up-ic" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M9 13h6M9 17h4" /></svg>
+                    </span>
+                    <span className="up-tx">
+                      <span className="up-t">{receiptName ? "Receipt added" : "Upload your transfer receipt"}</span>
+                      <span className="up-d">{receiptName || "Screenshot of the bank alert, or a photo of the teller slip"}</span>
+                    </span>
+                    {receiptPreview && <img className="up-pv on" src={receiptPreview} alt="" />}
+                  </label>
+                  {errors.receipt && <div className="err">{errors.receipt}</div>}
+                </div>
+                <div className="f" style={{ marginTop: 6 }}>
+                  <div className="opts">
+                    <label className={`opt${data.dec1 ? " checked" : ""}`}><input type="checkbox" checked={data.dec1} onChange={(e) => set("dec1", e.target.checked)} /><span>I have paid ₦50,000 to Joseph Opuene at Parallex Bank and the payment details above are correct.</span></label>
+                    <label className={`opt${data.dec2 ? " checked" : ""}`}><input type="checkbox" checked={data.dec2} onChange={(e) => set("dec2", e.target.checked)} /><span>I understand the exact training days in the first week of October 2026 will be sent to me after registration.</span></label>
+                  </div>
+                  {errors.declarations && <div className="err">{errors.declarations}</div>}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {submitError && <p className="hint" style={{ color: "var(--red)", marginTop: 14 }}>{submitError}</p>}
+
+          <div className="step-actions">
+            {step > 0 && <button type="button" className="btn btn-outline" onClick={back}>Back</button>}
+            {step < 4 && <button type="button" className="btn btn-gold" onClick={next}>Continue</button>}
+            {step === 4 && (
+              <button type="submit" className="btn btn-gold btn-wide" disabled={submitting}>
+                {submitting ? "Processing your registration…" : "Submit my registration"}
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+    </section>
+  );
+}
+
+function CopyButton({ text }) {
+  const [label, setLabel] = useState("Copy");
+  return (
+    <button
+      type="button"
+      className="copy"
+      onClick={() => {
+        navigator.clipboard?.writeText(text).then(
+          () => setLabel("Copied"),
+          () => setLabel("Copied")
+        );
+        setTimeout(() => setLabel("Copy"), 1600);
+      }}
+    >
+      {label}
+    </button>
+  );
+}
