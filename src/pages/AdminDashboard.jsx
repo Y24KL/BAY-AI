@@ -51,10 +51,10 @@ function DetailRow({ label, value }) {
   );
 }
 
-function DetailModal({ reg, onClose, onApprove, busy }) {
+function DetailModal({ reg, onClose, onApprove, busy, loading }) {
   return (
     <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto" style={{ background: "rgba(0,0,0,.65)" }} onClick={onClose}>
-      <div className="w-full max-w-2xl rounded-2xl p-6 sm:p-8 my-8" style={{ background: "var(--ink, #04100A)", border: "1px solid var(--line, #26382C)" }} onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-2xl rounded-2xl p-6 sm:p-8 my-8" style={{ background: "var(--ink, #04100A)", border: "1px solid var(--line, #26382C)", color: "var(--text, #EAF2EC)" }} onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-start mb-6">
           <div>
             <div className="text-xs font-bold tracking-[.2em]" style={{ color: "var(--gold, #F5B324)" }}>{reg.id}</div>
@@ -64,7 +64,9 @@ function DetailModal({ reg, onClose, onApprove, busy }) {
           <button onClick={onClose} className="text-2xl leading-none" style={{ color: "var(--muted, #9DB0A3)" }}>&times;</button>
         </div>
 
-        {reg.passportPhoto && (
+        {loading ? (
+          <p style={{ color: "var(--muted, #9DB0A3)" }}>Loading photo and receipt…</p>
+        ) : reg.passportPhoto && (
           <img src={reg.passportPhoto} alt="Passport" className="rounded-lg mb-6 max-h-48" style={{ border: "1px solid var(--line, #26382C)" }} />
         )}
 
@@ -105,7 +107,7 @@ function DetailModal({ reg, onClose, onApprove, busy }) {
         )}
 
         <div style={{ marginTop: 10 }}>
-          <ReceiptViewer reg={reg} />
+          {loading ? <p style={{ color: "var(--muted, #9DB0A3)" }}>Loading receipt…</p> : <ReceiptViewer reg={reg} />}
         </div>
 
         {reg.paymethod !== "venue" && (
@@ -135,11 +137,26 @@ export default function AdminDashboard() {
   const [editForm, setEditForm] = useState({});
   const [busyId, setBusyId] = useState(null);
   const [viewingReg, setViewingReg] = useState(null);
+  const [viewingLoading, setViewingLoading] = useState(false);
 
   async function loadRegistrations(c) {
     const res = await fetch(FN(c));
     if (!res.ok) throw new Error(res.status === 401 ? "Invalid email or password" : "Could not load registrations");
     return res.json();
+  }
+
+  async function handleView(reg) {
+    setViewingReg(reg); // show the lightweight row immediately, then fill in the rest
+    setViewingLoading(true);
+    try {
+      const res = await fetch(FN_ID(reg.id, creds));
+      if (!res.ok) throw new Error("Could not load full details");
+      setViewingReg(await res.json());
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setViewingLoading(false);
+    }
   }
 
   async function handleLogin(e) {
@@ -336,7 +353,7 @@ export default function AdminDashboard() {
                         </>
                       ) : (
                         <>
-                          <button onClick={() => setViewingReg(reg)} className="font-medium" style={{ color: "#fff" }}>View</button>
+                          <button onClick={() => handleView(reg)} className="font-medium" style={{ color: "#fff" }}>View</button>
                           <button onClick={() => handleDownloadQR(reg)} className="font-medium" style={{ color: "var(--green-bright, #17A048)" }}>QR</button>
                           <button onClick={() => handleEditClick(reg)} className="font-medium" style={{ color: "var(--gold, #F5B324)" }}>Edit</button>
                           <button onClick={() => handleDelete(reg.id)} disabled={busyId === reg.id} className="font-medium" style={{ color: "var(--red, #D01F2C)" }}>
@@ -359,6 +376,7 @@ export default function AdminDashboard() {
           onClose={() => setViewingReg(null)}
           onApprove={handleApprove}
           busy={busyId === viewingReg.id}
+          loading={viewingLoading}
         />
       )}
     </div>

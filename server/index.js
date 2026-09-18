@@ -126,6 +126,17 @@ app.post("/api/register", async (req, res) => {
   res.json({ id, issuedAt: row.issued_at, stored: true });
 });
 
+// Columns for the admin list view — everything except the two large
+// base64 blobs (passport photo, receipt file), which are only fetched when
+// a specific registration is opened. Keeps the table fast to load even with
+// many registrations.
+const LIST_COLUMNS = [
+  "id", "issued_at", "fullname", "email", "phone", "dob", "gender", "nationality",
+  "stateorigin", "address", "work", "occupation", "orgname", "level", "gadgets",
+  "internet", "starter", "starterwhat", "courses", "mode", "why", "after", "special",
+  "payername", "payref", "paydate", "payamount", "receipt_name", "pay_method", "payment_status",
+].join(",");
+
 // ---- GET /api/registration/:id ----
 app.get("/api/registration/:id", async (req, res) => {
   const { data, error } = await supabase.from(TABLE).select("*").eq("id", req.params.id).maybeSingle();
@@ -137,9 +148,18 @@ app.get("/api/registration/:id", async (req, res) => {
 // ---- GET /api/admin/registrations ----
 app.get("/api/admin/registrations", async (req, res) => {
   if (!isAdmin(req)) return res.status(401).json({ error: "Unauthorized access" });
-  const { data, error } = await supabase.from(TABLE).select("*").order("issued_at", { ascending: false });
+  const { data, error } = await supabase.from(TABLE).select(LIST_COLUMNS).order("issued_at", { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json(data.map(fromRow));
+});
+
+// ---- GET /api/admin/registrations/:id (full record, incl. photo/receipt) ----
+app.get("/api/admin/registrations/:id", async (req, res) => {
+  if (!isAdmin(req)) return res.status(401).json({ error: "Unauthorized access" });
+  const { data, error } = await supabase.from(TABLE).select("*").eq("id", req.params.id).maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(404).json({ error: "Not found" });
+  res.json(fromRow(data));
 });
 
 // ---- POST /api/admin/registrations/:id (edit / approve) ----
