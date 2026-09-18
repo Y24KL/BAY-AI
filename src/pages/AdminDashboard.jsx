@@ -7,14 +7,17 @@ const FN_ID = (id, params) => `/api/admin/registrations/${encodeURIComponent(id)
 export default function AdminDashboard() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [creds, setCreds] = useState(null); // { email, pass } once verified — kept in memory only
+  const [creds, setCreds] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [registrations, setRegistrations] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [busyId, setBusyId] = useState(null);
-  const [receiptModal, setReceiptModal] = useState(null); // State for receipt image popup
+  
+  // Modals for popup windows
+  const [receiptModal, setReceiptModal] = useState(null);
+  const [detailsModal, setDetailsModal] = useState(null); // <-- New state for full profile
 
   async function loadRegistrations(c) {
     const res = await fetch(FN(c));
@@ -166,7 +169,7 @@ export default function AdminDashboard() {
 
         <div className="rounded-xl overflow-hidden" style={{ background: "var(--ink, #04100A)", border: "1px solid var(--line, #26382C)" }}>
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[950px]">
+            <table className="w-full text-left border-collapse min-w-[1000px]">
               <thead>
                 <tr className="text-xs uppercase" style={{ background: "var(--soft, #111E16)", color: "var(--muted, #9DB0A3)" }}>
                   <th className="px-6 py-4">ID & date</th>
@@ -220,7 +223,6 @@ export default function AdminDashboard() {
                       </div>
                       <span className="font-mono px-2 py-1 rounded text-xs" style={{ background: "var(--soft, #111E16)" }}>{reg.payref}</span>
                       
-                      {/* View Receipt Button */}
                       {(reg.receiptUrl || reg.receipt) && (
                         <button 
                           onClick={() => setReceiptModal(reg.receiptUrl || reg.receipt)}
@@ -245,6 +247,8 @@ export default function AdminDashboard() {
                         </>
                       ) : (
                         <>
+                          <button onClick={() => setDetailsModal(reg)} className="font-bold" style={{ color: "#fff" }}>View</button>
+                          
                           {reg.status !== "Approved" && (
                             <button onClick={() => handleApprove(reg.id, reg)} disabled={busyId === reg.id} className="font-bold" style={{ color: "var(--green-bright, #17A048)" }}>
                               {busyId === reg.id ? "…" : "Approve"}
@@ -266,7 +270,109 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Receipt Viewer Modal matching the dark theme */}
+      {/* Profile Details Modal */}
+      {detailsModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4" 
+          style={{ background: "rgba(4,16,10,.86)", backdropFilter: "blur(4px)" }}
+          onClick={() => setDetailsModal(null)}
+        >
+          <div 
+            className="relative max-w-3xl w-full rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" 
+            style={{ background: "var(--paper, #0C1710)", border: "1px solid var(--line, #26382C)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 py-4 flex justify-between items-center" style={{ background: "var(--ink, #04100A)", borderBottom: "1px solid var(--line, #26382C)" }}>
+              <h3 className="font-bold text-lg" style={{ color: "#fff" }}>Participant Details</h3>
+              <button onClick={() => setDetailsModal(null)} className="text-xl font-bold hover:opacity-70 transition-opacity" style={{ color: "var(--muted, #9DB0A3)" }}>✕</button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto space-y-8" style={{ color: "var(--text, #EAF2EC)" }}>
+              {/* Profile Header */}
+              <div className="flex gap-4 items-start">
+                {detailsModal.passportPhoto ? (
+                  <img src={detailsModal.passportPhoto} alt="Passport" className="w-24 h-24 object-cover rounded-lg border" style={{ borderColor: "var(--line, #26382C)" }} />
+                ) : (
+                  <div className="w-24 h-24 rounded-lg flex items-center justify-center border text-xs" style={{ background: "var(--soft, #111E16)", borderColor: "var(--line, #26382C)", color: "var(--muted, #9DB0A3)" }}>No Photo</div>
+                )}
+                <div>
+                  <h4 className="text-2xl font-black" style={{ color: "var(--gold, #F5B324)" }}>{detailsModal.fullname}</h4>
+                  <p className="font-mono text-xs mt-1" style={{ color: "var(--muted, #9DB0A3)" }}>{detailsModal.id} • Registered {new Date(detailsModal.issuedAt).toLocaleDateString()}</p>
+                  <p className="mt-2 text-sm">{detailsModal.email} • {detailsModal.phone}</p>
+                </div>
+              </div>
+
+              {/* Data Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
+                <div>
+                  <h5 className="font-bold mb-3 uppercase text-[11px] tracking-wider" style={{ color: "var(--green-bright, #17A048)" }}>Personal Information</h5>
+                  <ul className="space-y-2">
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>DOB:</span> {detailsModal.dob}</li>
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Gender:</span> {detailsModal.gender || "—"}</li>
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Nationality:</span> {detailsModal.nationality}</li>
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>State of Origin:</span> {detailsModal.stateorigin || "—"}</li>
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Address:</span> {detailsModal.address}</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 className="font-bold mb-3 uppercase text-[11px] tracking-wider" style={{ color: "var(--green-bright, #17A048)" }}>Professional Background</h5>
+                  <ul className="space-y-2">
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Status:</span> {detailsModal.work}</li>
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Occupation:</span> {detailsModal.occupation}</li>
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Organization:</span> {detailsModal.orgname || "—"}</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 className="font-bold mb-3 uppercase text-[11px] tracking-wider" style={{ color: "var(--green-bright, #17A048)" }}>Tech & Gadgets</h5>
+                  <ul className="space-y-2">
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Skill Level:</span> {detailsModal.level}</li>
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Internet:</span> {detailsModal.internet}</li>
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Gadgets:</span> {detailsModal.gadgets?.join(", ") || "—"}</li>
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Starter Pack:</span> {detailsModal.starter} {detailsModal.starterwhat ? `(${detailsModal.starterwhat})` : ""}</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 className="font-bold mb-3 uppercase text-[11px] tracking-wider" style={{ color: "var(--green-bright, #17A048)" }}>Training & Payment</h5>
+                  <ul className="space-y-2">
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Mode:</span> {detailsModal.mode}</li>
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Payer Name:</span> {detailsModal.payername}</li>
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Pay Date:</span> {detailsModal.paydate}</li>
+                    <li><span style={{ color: "var(--muted, #9DB0A3)" }}>Amount Paid:</span> {detailsModal.payamount}</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+                <h5 className="font-bold mb-3 uppercase text-[11px] tracking-wider" style={{ color: "var(--green-bright, #17A048)" }}>Courses Selected</h5>
+                <div className="flex flex-wrap gap-2">
+                  {detailsModal.courses?.map(c => (
+                    <span key={c} className="px-3 py-1.5 rounded text-xs" style={{ background: "var(--soft, #111E16)", border: "1px solid var(--line, #26382C)" }}>{c}</span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                <div>
+                  <h5 className="font-bold mb-2 uppercase text-[11px] tracking-wider" style={{ color: "var(--green-bright, #17A048)" }}>Why do you want to learn AI?</h5>
+                  <p className="text-sm p-4 rounded leading-relaxed" style={{ background: "var(--soft, #111E16)" }}>{detailsModal.why}</p>
+                </div>
+                <div>
+                  <h5 className="font-bold mb-2 uppercase text-[11px] tracking-wider" style={{ color: "var(--green-bright, #17A048)" }}>Plans after training</h5>
+                  <p className="text-sm p-4 rounded leading-relaxed" style={{ background: "var(--soft, #111E16)" }}>{detailsModal.after}</p>
+                </div>
+                {detailsModal.special && (
+                  <div>
+                    <h5 className="font-bold mb-2 uppercase text-[11px] tracking-wider" style={{ color: "var(--gold, #F5B324)" }}>Special Needs & Questions</h5>
+                    <p className="text-sm p-4 rounded leading-relaxed" style={{ background: "rgba(245,179,36,.08)", border: "1px solid rgba(245,179,36,.2)" }}>{detailsModal.special}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Receipt Viewer Modal */}
       {receiptModal && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-4" 
@@ -297,4 +403,4 @@ export default function AdminDashboard() {
       )}
     </div>
   );
-                          }
+}
