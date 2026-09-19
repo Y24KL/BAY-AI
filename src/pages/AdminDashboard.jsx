@@ -54,7 +54,7 @@ function DetailRow({ label, value }) {
 function DetailModal({ reg, onClose, onApprove, busy, loading }) {
   return (
     <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto" style={{ background: "rgba(0,0,0,.65)" }} onClick={onClose}>
-      <div className="w-full max-w-2xl rounded-2xl p-6 sm:p-8 my-8" style={{ background: "var(--ink, #04100A)", border: "1px solid var(--line, #26382C)", color: "var(--text, #EAF2EC)" }} onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-2xl rounded-2xl p-6 sm:p-8 my-8" style={{ background: "var(--ink, #04100A)", border: "1px solid var(--line, #26382C)", color: "#EAF2EC" }} onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-start mb-6">
           <div>
             <div className="text-xs font-bold tracking-[.2em]" style={{ color: "var(--gold, #F5B324)" }}>{reg.id}</div>
@@ -283,7 +283,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen p-4 sm:p-8" style={{ background: "var(--paper, #0C1710)", color: "var(--text, #EAF2EC)" }}>
+    <div className="min-h-screen p-4 sm:p-8" style={{ background: "var(--paper, #0C1710)", color: "#EAF2EC" }}>
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>

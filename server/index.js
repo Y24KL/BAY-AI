@@ -188,8 +188,23 @@ app.delete("/api/admin/registrations/:id", async (req, res) => {
 
 // ---- serve the built frontend ----
 const distDir = path.join(__dirname, "..", "dist");
-app.use(express.static(distDir));
-app.get(/.*/, (req, res) => res.sendFile(path.join(distDir, "index.html")));
+// Hashed files under /assets can be cached forever (their filename changes
+// whenever their content does). index.html must never be cached, or the
+// browser can keep serving a stale shell that points at an old, no-longer-
+// deployed asset bundle after a new release goes out.
+app.use(express.static(distDir, {
+  setHeaders(res, filePath) {
+    if (filePath.endsWith("index.html")) {
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    } else {
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    }
+  },
+}));
+app.get(/.*/, (req, res) => {
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  res.sendFile(path.join(distDir, "index.html"));
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
