@@ -29,6 +29,7 @@ export default function RegistrationForm() {
   const [receiptName, setReceiptName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [showVenueNotice, setShowVenueNotice] = useState(false);
   const stepRef = useRef(null);
 
   function set(field, value) {
@@ -146,6 +147,7 @@ export default function RegistrationForm() {
   const cx = (base, bad) => base + (bad ? " bad" : "");
 
   return (
+    <>
     <section className="band form-band" id="register">
       <div className="wrap">
         <div className="sec-eyebrow">Registration</div>
@@ -365,7 +367,7 @@ export default function RegistrationForm() {
                       <span>Pay now by bank transfer</span>
                     </label>
                     <label className={`opt${data.paymethod === "venue" ? " checked" : ""}`}>
-                      <input type="radio" name="paymethod" checked={data.paymethod === "venue"} onChange={() => set("paymethod", "venue")} />
+                      <input type="radio" name="paymethod" checked={data.paymethod === "venue"} onChange={() => { set("paymethod", "venue"); setShowVenueNotice(true); }} />
                       <span>Pay ₦50,000 at the venue on arrival</span>
                     </label>
                   </div>
@@ -454,6 +456,34 @@ export default function RegistrationForm() {
         </form>
       </div>
     </section>
+
+    {showVenueNotice && (
+      <div
+        role="dialog" aria-modal="true"
+        style={{ position: "fixed", inset: 0, zIndex: 80, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(0,0,0,.7)" }}
+        onClick={() => setShowVenueNotice(false)}
+      >
+        <div
+          style={{ maxWidth: 440, width: "100%", background: "#04100A", border: "1px solid #26382C", borderRadius: 16, padding: "28px 26px", color: "#EAF2EC" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h3 style={{ color: "#F5B324", fontSize: 20, fontWeight: 800, marginBottom: 12 }}>Before you choose to pay at the venue</h3>
+          <p style={{ lineHeight: 1.6, marginBottom: 10 }}>
+            Paying at the venue still secures your training slot, but you will <strong>not</strong> have access to:
+          </p>
+          <ul style={{ lineHeight: 1.7, marginBottom: 16, paddingLeft: 20 }}>
+            <li>The starter pack</li>
+            <li>Free funds to start up your business</li>
+            <li>The free laptop giveaway</li>
+          </ul>
+          <p style={{ lineHeight: 1.6, marginBottom: 18, color: "#9FD4B0" }}>
+            These are reserved for participants who pay ₦50,000 before the training. You can still switch to "Pay now" above at any time before submitting.
+          </p>
+          <button type="button" className="btn btn-gold btn-wide" onClick={() => setShowVenueNotice(false)}>I understand, continue</button>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
 
