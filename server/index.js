@@ -23,7 +23,7 @@ const REQUIRED_FIELDS = [
   "fullname", "email", "phone", "dob", "nationality", "address",
   "occupation", "internet", "why", "after",
 ];
-const REQUIRED_PAY_NOW_FIELDS = ["payername", "payref", "paydate", "payamount"];
+const REQUIRED_PAY_NOW_FIELDS = ["payername", "paydate", "payamount"];
 
 function toRow(id, body) {
   const payMethod = body.paymethod === "venue" ? "venue" : "now";

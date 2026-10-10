@@ -94,12 +94,10 @@ export default function RegistrationForm() {
     if (i === 4) {
       if (data.paymethod === "now") {
         if (!data.payername.trim()) e.payername = "Enter the payer's name.";
-        if (data.payref.trim().length < 4) e.payref = "Enter your payment reference.";
         if (!data.paydate) e.paydate = "Enter the date you paid.";
         if (!data.payamount.trim()) e.payamount = "Enter the amount.";
-        if (!receiptName) e.receipt = "Upload proof of your ₦50,000 payment.";
+        if (!receiptName) e.receipt = "Upload proof of your ₦20,000 payment.";
       }
-      if (!data.dec1 || !data.dec2) e.declarations = "Tick both boxes to submit.";
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -310,7 +308,7 @@ export default function RegistrationForm() {
             {step === 3 && (
               <>
                 <div className="step-hd"><div className="step-no">4</div><div className="step-ti">Your courses and how you will attend</div></div>
-                <p className="step-note">Tick every course you want — your ₦50,000 covers all of them.</p>
+                <p className="step-note">Tick every course you want — your ₦20,000 covers all of them.</p>
                 <div className="f"><label className="lb">Courses <span className="req">*</span></label>
                   <div className="tiles">
                     {COURSES.map(([t, d]) => {
@@ -355,10 +353,10 @@ export default function RegistrationForm() {
 
             {step === 4 && (
               <div className="pay">
-                <div className="step-hd"><div className="step-no" style={{ background: "var(--gold)", color: "#12200F" }}>5</div><h3 className="step-ti" style={{ color: "#fff" }}>Pay ₦50,000, then submit</h3></div>
+                <div className="step-hd"><div className="step-no" style={{ background: "var(--gold)", color: "#12200F" }}>5</div><h3 className="step-ti" style={{ color: "#fff" }}>Pay ₦20,000, then submit</h3></div>
                 <p className="pnote">{data.paymethod === "now"
                   ? "Transfer the fee to the account below. Your registration is confirmed only after we match your payment."
-                  : "You can also pay ₦50,000 in cash when you arrive at the venue. Your slot is held once you register — just bring the exact amount on the day."}</p>
+                  : "You can also pay ₦20,000 in cash when you arrive at the venue. Your slot is held once you register — just bring the exact amount on the day."}</p>
 
                 <div className="f" style={{ marginTop: 6, marginBottom: 6 }}>
                   <div className="opts">
@@ -368,7 +366,7 @@ export default function RegistrationForm() {
                     </label>
                     <label className={`opt${data.paymethod === "venue" ? " checked" : ""}`}>
                       <input type="radio" name="paymethod" checked={data.paymethod === "venue"} onChange={() => { set("paymethod", "venue"); setShowVenueNotice(true); }} />
-                      <span>Pay ₦50,000 at the venue on arrival</span>
+                      <span>Pay ₦20,000 at the venue on arrival</span>
                     </label>
                   </div>
                 </div>
@@ -386,16 +384,10 @@ export default function RegistrationForm() {
                       </div>
                       <div className="acct-row"><span className="acct-k">Amount</span><span className="acct-v" style={{ color: "var(--gold)" }}>₦{BANK.amount}</span></div>
                     </div>
-                    <div className="warn">Keep your transfer receipt. You need the transaction reference below — it is how we match your payment to your name.</div>
-                    <div className="grid2">
-                      <div className="f"><label className="lb">Name on the account you paid from <span className="req">*</span></label>
-                        <input type="text" value={data.payername} onChange={(e) => set("payername", e.target.value)} placeholder="If someone paid for you, their name" />
-                        {errors.payername && <div className="err">{errors.payername}</div>}
-                      </div>
-                      <div className="f"><label className="lb">Transaction reference or teller number <span className="req">*</span></label>
-                        <input type="text" value={data.payref} onChange={(e) => set("payref", e.target.value)} placeholder="From your bank alert or receipt" />
-                        {errors.payref && <div className="err">{errors.payref}</div>}
-                      </div>
+                    <div className="warn">Keep your transfer receipt. Upload it below — it is how we match your payment to your name.</div>
+                    <div className="f"><label className="lb">Name on the account you paid from <span className="req">*</span></label>
+                      <input type="text" value={data.payername} onChange={(e) => set("payername", e.target.value)} placeholder="If someone paid for you, their name" />
+                      {errors.payername && <div className="err">{errors.payername}</div>}
                     </div>
                     <div className="grid2">
                       <div className="f"><label className="lb">Date you paid <span className="req">*</span></label>
@@ -423,21 +415,10 @@ export default function RegistrationForm() {
                     </div>
                   </>
                 ) : (
-                  <div className="warn">You'll pay ₦50,000 in cash (or by transfer on the day) when you arrive at Ebitari Hotel, Yenagoa. Your registration and slot are confirmed now — payment is simply collected at check-in.</div>
+                  <div className="warn">You'll pay ₦20,000 in cash (or by transfer on the day) when you arrive at Ebitari Hotel, Yenagoa. Your registration and slot are confirmed now — payment is simply collected at check-in.</div>
                 )}
 
-                <div className="f" style={{ marginTop: 6 }}>
-                  <div className="opts">
-                    <label className={`opt${data.dec1 ? " checked" : ""}`}>
-                      <input type="checkbox" checked={data.dec1} onChange={(e) => set("dec1", e.target.checked)} />
-                      <span>{data.paymethod === "now"
-                        ? "I have paid ₦50,000 to Joseph Opuene at Parallex Bank and the payment details above are correct."
-                        : "I understand I must pay ₦50,000 at the venue on arrival to complete my registration."}</span>
-                    </label>
-                    <label className={`opt${data.dec2 ? " checked" : ""}`}><input type="checkbox" checked={data.dec2} onChange={(e) => set("dec2", e.target.checked)} /><span>I understand the exact training days in the first week of October 2026 will be sent to me after registration.</span></label>
-                  </div>
-                  {errors.declarations && <div className="err">{errors.declarations}</div>}
-                </div>
+                <p className="terms-note">I understand the terms and conditions.</p>
               </div>
             )}
           </div>
@@ -477,7 +458,7 @@ export default function RegistrationForm() {
             <li>The free laptop giveaway</li>
           </ul>
           <p style={{ lineHeight: 1.6, marginBottom: 18, color: "#9FD4B0" }}>
-            These are reserved for participants who pay ₦50,000 before the training. You can still switch to "Pay now" above at any time before submitting.
+            These are reserved for participants who pay ₦20,000 before the training. You can still switch to "Pay now" above at any time before submitting.
           </p>
           <button type="button" className="btn btn-gold btn-wide" onClick={() => setShowVenueNotice(false)}>I understand, continue</button>
         </div>

@@ -46,7 +46,8 @@ export const STARTER = ["Yes, I want a starter pack", "No, I am fine without one
 export const GROUP_LINK = "https://chat.whatsapp.com/F1ovN2T6kaFFKxsgRuPQy1?s=cl&p=i&mlu=4&ilr=4";
 export const NOTIFY_EMAIL = "opujoedou@gmail.com";
 export const NOTIFY_PHONE = "2348152093040";
-export const BANK = { bank: "Parallex Bank", name: "Joseph Opuene", account: "2000033733", amount: "50,000" };
+export const FEE = "20,000";
+export const BANK = { bank: "Parallex Bank", name: "Joseph Opuene", account: "2000033733", amount: FEE };
 
 export function emptyForm() {
   return {
@@ -55,8 +56,7 @@ export function emptyForm() {
     work: "", occupation: "", orgname: "",
     level: "", gadgets: [], internet: "", starter: "", starterwhat: "",
     courses: [], mode: "", why: "", after: "", special: "",
-    payername: "", payref: "", paydate: "", payamount: "50,000",
+    payername: "", paydate: "", payamount: FEE,
     paymethod: "now", // "now" | "venue"
-    dec1: false, dec2: false,
   };
 }

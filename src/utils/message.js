@@ -39,10 +39,9 @@ export function registrationText(r) {
   L.push("");
   L.push("*PAYMENT*");
   if (r.paymethod === "venue") {
-    L.push("Will pay ₦50,000 in cash at the venue on arrival.");
+    L.push("Will pay ₦20,000 in cash at the venue on arrival.");
   } else {
     L.push("Paid by: " + r.payername);
-    L.push("Reference: " + r.payref);
     L.push("Date paid: " + niceDate(r.paydate));
     L.push("Amount: ₦" + r.payamount);
     L.push("To: Parallex Bank / Joseph Opuene / 2000033733");

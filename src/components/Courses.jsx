@@ -11,7 +11,7 @@ export default function Courses() {
       <div className="wrap">
         <div className="sec-eyebrow" data-reveal>What you'll learn</div>
         <h2 className="sec-head" data-reveal>Seven courses. One registration.</h2>
-        <p className="sec-note" data-reveal>Your ₦50,000 covers every course listed here. Pick as many as you like when you register — take all seven if you want the full expedition.</p>
+        <p className="sec-note" data-reveal>Your ₦20,000 covers every course listed here. Pick as many as you like when you register — take all seven if you want the full expedition.</p>
         <div className="tiles">
           {COURSES.map((c, i) => (
             <div className="tile" key={c[0]} data-reveal>

@@ -3,7 +3,7 @@ import { useReveal } from "../lib/reveal";
 
 const STEPS = [
   ["01", "Register", "Fill in your details and pick your courses."],
-  ["02", "Pay & upload", "Transfer ₦50,000, then upload your receipt and passport photo."],
+  ["02", "Pay & upload", "Transfer ₦20,000, then upload your receipt and passport photo."],
   ["03", "Get your ID", "Your unique Registration ID and digital card are generated instantly."],
   ["04", "Join the group", "Share your card and join the WhatsApp group for training-week details."],
 ];

@@ -1,5 +1,5 @@
 const FACTS = [
-  { k: "Training fee", v: "₦50,000", n: "All seven courses, full week" },
+  { k: "Training fee", v: "₦20,000", n: "All seven courses, full week" },
   { k: "Training week", v: "First week, October 2026", n: "Exact days sent to registered participants" },
   { k: "Venue", v: "Ebitari Hotel", n: "Yenagoa, Bayelsa State — or join online" },
   { k: "Registration closes", v: "30th September", n: "Or when the 150 slots fill" },

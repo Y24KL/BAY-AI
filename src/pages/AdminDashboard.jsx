@@ -20,7 +20,7 @@ function StatusBadge({ reg }) {
 
 function ReceiptViewer({ reg }) {
   if (reg.paymethod === "venue") {
-    return <p style={{ color: "var(--muted, #9DB0A3)" }}>No receipt — this participant is paying ₦50,000 at the venue.</p>;
+    return <p style={{ color: "var(--muted, #9DB0A3)" }}>No receipt — this participant is paying ₦20,000 at the venue.</p>;
   }
   if (!reg.receiptFile) {
     return <p style={{ color: "var(--muted, #9DB0A3)" }}>No receipt file was saved for this registration{reg.receiptName ? ` (filename on record: ${reg.receiptName})` : ""}.</p>;
@@ -96,11 +96,10 @@ function DetailModal({ reg, onClose, onApprove, busy, loading }) {
 
         <h3 className="font-bold mb-3">Payment</h3>
         {reg.paymethod === "venue" ? (
-          <p style={{ color: "var(--gold, #F5B324)", fontWeight: 600 }}>Will pay ₦50,000 in cash at the venue on arrival.</p>
+          <p style={{ color: "var(--gold, #F5B324)", fontWeight: 600 }}>Will pay ₦20,000 in cash at the venue on arrival.</p>
         ) : (
           <div className="grid sm:grid-cols-2 gap-x-6 mb-4">
             <DetailRow label="Paid by" value={reg.payername} />
-            <DetailRow label="Reference" value={reg.payref} />
             <DetailRow label="Date paid" value={reg.paydate} />
             <DetailRow label="Amount" value={reg.payamount ? "₦" + reg.payamount : ""} />
           </div>
@@ -240,7 +239,7 @@ export default function AdminDashboard() {
 
   async function handleDownloadQR(reg) {
     try {
-      const qrData = `ID: ${reg.id}\nName: ${reg.fullname}\nEmail: ${reg.email}\nRef: ${reg.payref}`;
+      const qrData = `ID: ${reg.id}\nName: ${reg.fullname}\nEmail: ${reg.email}`;
       const qrCodeUrl = await QRCode.toDataURL(qrData, { width: 400, margin: 2 });
       const link = document.createElement("a");
       link.href = qrCodeUrl;
