@@ -235,4 +235,3 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,va
   .acct-v{text-align:left}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-.terms-note{margin-top:6px;font-size:14.5px;color:rgba(255,255,255,.85)}

@@ -98,6 +98,7 @@ export default function RegistrationForm() {
         if (!data.payamount.trim()) e.payamount = "Enter the amount.";
         if (!receiptName) e.receipt = "Upload proof of your ₦20,000 payment.";
       }
+      if (!data.terms) e.terms = "Tick the box to submit.";
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -418,7 +419,15 @@ export default function RegistrationForm() {
                   <div className="warn">You'll pay ₦20,000 in cash (or by transfer on the day) when you arrive at Ebitari Hotel, Yenagoa. Your registration and slot are confirmed now — payment is simply collected at check-in.</div>
                 )}
 
-                <p className="terms-note">I understand the terms and conditions.</p>
+                <div className="f" style={{ marginTop: 6 }}>
+                  <div className="opts">
+                    <label className={`opt${data.terms ? " checked" : ""}`}>
+                      <input type="checkbox" checked={data.terms} onChange={(e) => set("terms", e.target.checked)} />
+                      <span>I understand the terms and conditions.</span>
+                    </label>
+                  </div>
+                  {errors.terms && <div className="err">{errors.terms}</div>}
+                </div>
               </div>
             )}
           </div>

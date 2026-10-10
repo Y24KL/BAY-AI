@@ -58,5 +58,6 @@ export function emptyForm() {
     courses: [], mode: "", why: "", after: "", special: "",
     payername: "", paydate: "", payamount: FEE,
     paymethod: "now", // "now" | "venue"
+    terms: false,
   };
 }
