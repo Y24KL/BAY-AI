@@ -36,7 +36,7 @@ export const GADGETS = [
 ];
 
 export const MODES = [
-  ["On-site at Ebitari Hotel, Yenagoa", "Attend in person for the full week"],
+  ["On-site at Christ Embassy Bayelsa Zonal Church, Along Sanni Abacha Expressway, Yenagoa, Bayelsa State", "Attend in person for the full week"],
   ["Online", "Join every session remotely"],
   ["Either one works for me", ""],
 ];
